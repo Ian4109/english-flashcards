@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="每回合十個單字，搭配 POP QUIZ 與累積錯題紀錄。">
+  <title>每日單字 · English Flashcards</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <main class="study">
+    <header>
+      <p class="eyebrow">A LITTLE ENGLISH, EVERY DAY</p>
+      <h1>每日單字</h1>
+      <p class="intro">先想想意思，再翻開答案。每天進步一點點。</p>
+    </header>
+    <section aria-label="英文單字練習">
+      <div class="progress-row"><span>日常單字練習</span><span id="progress" aria-live="polite"></span></div>
+      <progress id="progress-bar" max="6" value="1" aria-label="單字卡進度"></progress>
+      <article id="practice-card" class="card">
+        <div class="word-content" aria-live="polite" aria-atomic="true">
+          <p class="card-label">TODAY’S WORD</p>
+          <h2 id="word" lang="en"></h2>
+          <p id="example" class="example" lang="en"></p>
+        </div>
+        <div class="answer-area" aria-live="polite">
+          <p id="hint" class="hint">這個單字的中文是什麼？</p>
+          <p id="translation" class="translation" hidden></p>
+        </div>
+      </article>
+      <div id="practice-actions" class="actions">
+        <button id="toggle-answer" type="button" aria-expanded="false" aria-controls="translation">翻開中文</button>
+        <button id="next-card" class="primary" type="button">下一張 <span aria-hidden="true">→</span></button>
+      </div>
+      <section id="quiz" class="completion" aria-labelledby="quiz-title" hidden>
+        <p id="quiz-mode" class="eyebrow">POP QUIZ · 看中文，選英文</p>
+        <h2 id="quiz-title" tabindex="-1"></h2>
+        <p id="quiz-instruction">選出本回合學過、符合這個意思的單字。</p>
+        <div id="quiz-options" class="quiz-options"></div>
+        <form id="quiz-form" hidden>
+          <label for="quiz-input">請輸入英文（不分大小寫）</label>
+          <input id="quiz-input" autocomplete="off" autocapitalize="none" spellcheck="false">
+          <button type="submit">確認答案</button>
+        </form>
+        <p id="quiz-feedback" role="status"></p>
+        <button id="quiz-next" class="primary" type="button" hidden>下一題</button>
+      </section>
+      <div id="round-complete" class="completion" hidden>
+        <h2 id="completion-title" tabindex="-1">本回合完成！</h2>
+        <p id="completion-summary"></p>
+        <div class="actions">
+          <button id="retry-round" type="button">再練一次</button>
+          <button id="new-round" class="primary" type="button">隨機新回合</button>
+        </div>
+        <p class="footnote">再練一次會保留這組單字與順序；新回合重新抽選，可能遇到之前練過的字。</p>
+      </div>
+      <p id="deck-summary" class="footnote"></p>
+    </section>
+    <section class="import-panel" aria-labelledby="mistakes-title">
+      <h2 id="mistakes-title">累積錯題紀錄</h2>
+      <p id="storage-status">儲存在此瀏覽器；不同裝置或網址不會同步，清除網站資料後會消失。</p>
+      <p id="mistakes-summary" aria-live="polite"></p>
+      <details><summary>查看錯題與答錯次數</summary><ul id="mistakes-list" class="mistakes-list"></ul></details>
+    </section>
+    <section class="import-panel" aria-labelledby="import-title">
+      <h2 id="import-title">我的字彙表</h2>
+      <p>匯入 UTF-8 CSV，第一列請使用「英文,中文,例句」或「english,chinese,example」。英文和中文必填，例句可留空。</p>
+      <label for="vocabulary-file">選擇 CSV 檔案（上限 1 MB）</label>
+      <input id="vocabulary-file" type="file" accept=".csv,text/csv" aria-describedby="import-status import-note">
+      <div class="import-actions">
+        <button id="download-template" type="button">下載 CSV 範本</button>
+        <button id="restore-demo" type="button">恢復示範單字</button>
+      </div>
+      <p id="import-status" role="status">目前使用示範字彙表。</p>
+      <p id="import-note">檔案只在你的瀏覽器內讀取。匯入後會取代目前字卡；重新整理網頁後回到示範字彙表。Excel 請另存為「CSV UTF-8」。</p>
+    </section>
+    <noscript>請開啟 JavaScript，以使用單字卡。</noscript>
+  </main>
+</body>
+</html>

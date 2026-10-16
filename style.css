@@ -1,0 +1,68 @@
+:root {
+  color-scheme: light;
+  font-family: system-ui, -apple-system, "Segoe UI", "Microsoft JhengHei", sans-serif;
+  color: #233d38;
+  background: #f6f5ef;
+  font-synthesis: none;
+}
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100vh; padding: 64px 24px 36px; }
+.study { max-width: 600px; margin: 0 auto; }
+header { margin-bottom: 38px; }
+.eyebrow { color: #547065; font-size: 11px; font-weight: 700; letter-spacing: 2px; }
+h1 { margin: 12px 0; font-size: clamp(30px, 6vw, 40px); letter-spacing: 2px; }
+.intro { color: #65736c; font-size: 15px; line-height: 1.8; }
+.progress-row { display: flex; justify-content: space-between; gap: 16px; font-size: 13px; font-weight: 600; }
+progress { display: block; width: 100%; height: 5px; margin: 13px 0 22px; border: 0; border-radius: 8px; overflow: hidden; background: #e0e5dc; accent-color: #356653; }
+progress::-webkit-progress-bar { background: #e0e5dc; }
+progress::-webkit-progress-value { background: #356653; border-radius: 8px; }
+progress::-moz-progress-bar { background: #356653; }
+.card { background: #fffefa; border: 1px solid #e0e3d8; border-radius: 24px; box-shadow: 0 12px 35px #273b2e08; overflow: hidden; text-align: center; }
+.word-content { padding: 40px 24px 32px; }
+.card-label { margin: 0; font-size: 10px; font-weight: 700; letter-spacing: 2px; color: #6c7b6d; }
+h2 { margin: 22px 0 16px; font-size: clamp(38px, 9vw, 58px); font-weight: 600; letter-spacing: -1.5px; overflow-wrap: anywhere; }
+.example { margin: 0; min-height: 48px; color: #617168; font-size: 17px; line-height: 1.6; }
+.answer-area { display: grid; place-items: center; min-height: 100px; padding: 20px; background: #f0f3eb; border-top: 1px dashed #d8dfd2; }
+.hint { margin: 0; font-size: 14px; color: #6a766b; }
+.translation { margin: 0; font-size: 25px; font-weight: 600; }
+[hidden] { display: none !important; }
+.actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+button { min-height: 54px; border: 1px solid #bdcbbd; border-radius: 12px; background: transparent; color: #2e5344; font: inherit; font-size: 16px; font-weight: 600; cursor: pointer; touch-action: manipulation; }
+button:hover { background: #e9eee3; }
+button.primary { color: white; background: #2e5947; border-color: #2e5947; }
+button.primary:hover { background: #234637; }
+button span { margin-left: 12px; }
+button:focus-visible { outline: 3px solid #ae7227; outline-offset: 4px; }
+.footnote { color: #6a756d; text-align: center; font-size: 12px; line-height: 1.8; margin: 22px 0 0; }
+.completion { padding: 28px 20px; background: #f0f3eb; border: 1px solid #d8dfd2; border-radius: 20px; text-align: center; }
+.completion h2 { font-size: 28px; letter-spacing: 0; margin: 8px 0 18px; }
+.completion p { line-height: 1.8; }
+.quiz-options { display: grid; gap: 10px; }
+.quiz-options button { padding: 12px; overflow-wrap: anywhere; }
+button:disabled { cursor: default; opacity: .75; }
+.quiz-options .correct { border: 2px solid #2e5947; background: #dfeedd; }
+.quiz-options .incorrect { border: 2px solid #a03423; background: #fbe6df; }
+#quiz-next { width: 100%; padding: 12px; }
+#quiz-form input { width: 100%; padding: 12px; margin: 12px 0; font: inherit; }
+#quiz-title { overflow-wrap: anywhere; }
+.mistakes-list { padding-left: 22px; max-height: 380px; overflow-y: auto; }
+.mistakes-list li { padding: 10px 0; line-height: 1.7; overflow-wrap: anywhere; }
+summary { cursor: pointer; padding: 10px 0; }
+.import-panel { margin-top: 32px; padding: 24px; border: 1px solid #d8dfd2; border-radius: 18px; background: #fffefa; }
+.import-panel h2 { font-size: 21px; letter-spacing: 0; margin: 0 0 12px; }
+.import-panel p { font-size: 14px; line-height: 1.8; overflow-wrap: anywhere; }
+.import-panel label { display: block; font-size: 14px; font-weight: 600; margin: 20px 0 8px; }
+.import-panel input { display: block; width: 100%; min-width: 0; font: inherit; font-size: 14px; }
+.import-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.import-actions button { flex: 1 1 140px; font-size: 14px; padding: 8px; }
+#import-note { color: #65736c; font-size: 12px; }
+#import-status { font-weight: 600; }
+#import-status.error { color: #a03423; }
+.example, .translation { overflow-wrap: anywhere; white-space: pre-wrap; }
+@media (max-width: 480px) {
+  body { padding: 32px 18px 24px; }
+  header { margin-bottom: 28px; }
+  .word-content { padding: 32px 18px 26px; }
+  .example { font-size: 16px; }
+  .card { border-radius: 20px; }
+}
