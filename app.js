@@ -40,6 +40,8 @@ function startRound(reuse = false) {
   }
   currentIndex = 0;
   roundFinished = false;
+  nextButton.disabled = false;
+  toggleButton.disabled = false;
   document.querySelector("#quiz").hidden = true;
   document.querySelector("#round-complete").hidden = true;
   document.querySelector("#practice-card").hidden = false;
@@ -313,3 +315,36 @@ quizNext.addEventListener("click", () => {
 });
 renderMistakes();
 startRound();
+
+async function loadWebsiteVocabulary() {
+  const version = importVersion;
+  if (location.protocol === "file:") {
+    importStatus.textContent = "本機直接開啟時請手動匯入 CSV；正式網站會自動載入字彙表。目前使用示範單字。";
+    return;
+  }
+  nextButton.disabled = true;
+  toggleButton.disabled = true;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 12000);
+  try {
+    const response = await fetch("vocabulary.csv", { cache: "no-store", signal: controller.signal });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const buffer = await response.arrayBuffer();
+    if (buffer.byteLength > 1024 * 1024) throw new Error("字彙表超過 1 MB");
+    const imported = parseVocabulary(new TextDecoder("utf-8", { fatal: true }).decode(buffer));
+    if (version !== importVersion) return;
+    words = imported;
+    startRound();
+    importStatus.classList.remove("error");
+    importStatus.textContent = `已自動載入網站字彙表，共 ${words.length} 個單字。`;
+  } catch {
+    if (version !== importVersion) return;
+    importStatus.classList.add("error");
+    importStatus.textContent = "網站字彙表暫時無法載入，先使用示範單字。你可以手動匯入 CSV 或重新整理重試。";
+  } finally {
+    clearTimeout(timeout);
+    nextButton.disabled = false;
+    toggleButton.disabled = false;
+  }
+}
+loadWebsiteVocabulary();
