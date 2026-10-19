@@ -10,6 +10,42 @@ const demoWords = [
 ];
 let words = demoWords;
 
+// Authored practice items, not official TOEIC questions. Distractors are fixed
+// per sentence to avoid arbitrary synonyms becoming additional correct answers.
+const collocations = {
+  basis: ["All equipment must be inspected on a regular ___ to ensure safe operation.", ["frequency", "interval", "foundation"], "on a regular basis＝定期地；不能把 basis 直接換成 frequency。"],
+  behalf: ["Ms. Chen signed the agreement on ___ of the company.", ["favor", "response", "purpose"], "on behalf of＝代表。"],
+  advance: ["Please book your conference room at least two weeks in ___.", ["prior", "ahead", "previous"], "in advance＝提前；ahead 與 prior 不接在 in 後形成此搭配。"],
+  comply: ["All suppliers must ___ with the new safety regulations.", ["fulfill", "satisfy", "perform"], "comply with regulations＝遵守規定；fulfill、satisfy 不使用此處的 with。"],
+  compliance: ["The facility operates in ___ with local safety regulations.", ["permission", "attendance", "application"], "in compliance with＝遵守、符合。"],
+  eligible: ["Employees who have completed one year of service are ___ for this bonus.", ["liable", "prone", "adjacent"], "eligible for a bonus＝有資格領取獎金。"],
+  exempt: ["Registered charities are ___ from paying this application fee.", ["liable", "subject", "prone"], "exempt from＝免除；這裡是免繳申請費。"],
+  liable: ["Under the contract, the supplier is legally ___ for damage caused by defective parts.", ["eligible", "adjacent", "proficient"], "liable for damages＝對損害負法律責任。"],
+  proficient: ["Applicants must be ___ in using spreadsheet software.", ["contingent", "adjacent", "liable"], "proficient in＝精通、熟練於。"],
+  contingent: ["Final approval of the loan is ___ on a satisfactory credit check.", ["adjacent", "proficient", "exempt"], "contingent on＝取決於；核貸取決於信用審查。"],
+  compatible: ["The new printer is ___ with our existing operating system.", ["eligible", "liable", "prone"], "compatible with＝與……相容。"],
+  conducive: ["A quiet workspace is ___ to concentration and careful analysis.", ["eligible", "liable", "exempt"], "conducive to＝有助於；to 後接名詞。"],
+  commensurate: ["The salary offered will be ___ with the successful candidate's experience.", ["adjacent", "liable", "prone"], "commensurate with＝與……相稱；薪資與經驗相符。"],
+  prone: ["Without regular maintenance, this older model is ___ to breakdowns.", ["eligible", "exempt", "proficient"], "prone to＝容易發生……；prone to breakdowns＝容易故障。"],
+  response: ["The company introduced additional training in ___ to customer complaints.", ["behalf", "basis", "favor"], "in response to＝回應、因應。"],
+  favor: ["Eight of the ten directors voted in ___ of the proposal.", ["behalf", "response", "advance"], "in favor of＝支持、贊成。"],
+  effect: ["The revised parking rules will take ___ on November 1.", ["affect", "effective", "effectively"], "take effect＝生效；effect 在此是名詞。"],
+  discretion: ["Managers may approve exceptions at their own ___.", ["discrepancy", "disclosure", "distinction"], "at one's discretion＝由某人自行裁量。"],
+  discrepancy: ["The accountant found a ___ between the invoice total and the amount paid.", ["discretion", "disclosure", "disposition"], "a discrepancy between A and B＝A 與 B 之間的不一致。"],
+  distinction: ["The policy makes a clear ___ between personal and business expenses.", ["disclosure", "discretion", "disposition"], "make a distinction between＝區分兩者。"],
+  complimentary: ["Breakfast is ___ for hotel guests, so no additional payment is required.", ["complementary", "compulsory", "compliant"], "complimentary breakfast＝免費早餐；complementary 是互補的。"],
+  reimburse: ["The company will ___ employees for approved travel expenses after receipts are submitted.", ["replenish", "reconcile", "retrieve"], "reimburse someone for expenses＝報銷某人的費用。"],
+  replenish: ["The warehouse must ___ its inventory after the holiday sales rush.", ["reimburse", "remit", "testify"], "replenish inventory＝補充庫存。"],
+  waive: ["As a courtesy, the bank agreed to ___ the service fee, so the customer owes nothing.", ["accrue", "remit", "incur"], "waive a fee＝免收費用；remit 是匯款。"],
+  remit: ["Please ___ payment to the bank account shown on the invoice.", ["reimburse", "replenish", "testify"], "remit payment＝匯款付款。"],
+  solicit: ["The purchasing department will ___ bids from qualified contractors.", ["accrue", "reimburse", "testify"], "solicit bids＝徵求投標。"],
+  substantiate: ["Employees must provide receipts to ___ their expense claims.", ["replenish", "allocate", "waive"], "substantiate a claim＝以證據支持申請或主張。"],
+  vicinity: ["Several hotels are located in the ___ of the convention center.", ["vacancy", "inventory", "discretion"], "in the vicinity of＝在……附近。"],
+  premises: ["Visitors must wear identification badges while on company ___.", ["promises", "provisions", "purposes"], "on company premises＝在公司場所內；premises 是場所，不是 promises（承諾）。"],
+  goodwill: ["The retailer offered a free replacement as a gesture of ___.", ["inventory", "liability", "vacancy"], "a gesture of goodwill＝表示善意的舉動。"]
+};
+function collocationFor(entry) { return collocations[entry.english.trim().toLowerCase()]; }
+
 const word = document.querySelector("#word");
 const example = document.querySelector("#example");
 const translation = document.querySelector("#translation");
@@ -36,6 +72,7 @@ function startRound(reuse = false, mode = "random") {
     if (mode !== "random") {
       pool = pool.filter(entry => {
         const record = learning.find(item => identity(item) === identity(entry));
+        if (mode === "collocations") return Boolean(collocationFor(entry));
         if (mode === "mistakes") return mistakes.some(item => identity(item) === identity(entry));
         if (mode === "uncertain") return record?.outcome === "uncertain";
         return record && record.due <= dayKey();
@@ -83,7 +120,7 @@ function renderCard() {
   progressBar.max = roundWords.length;
   progressBar.value = currentIndex + 1;
   nextButton.textContent = currentIndex === roundWords.length - 1 ? "開始 POP QUIZ" : "下一張 →";
-  const modeLabel = { random: "隨機練習", due: "今日待複習", mistakes: "錯題專屬", uncertain: "不確定字彙" }[roundMode];
+  const modeLabel = { random: "隨機練習", due: "今日待複習", mistakes: "錯題專屬", uncertain: "不確定字彙", collocations: "TOEIC 搭配詞填空" }[roundMode];
   document.querySelector("#deck-summary").textContent = `${modeLabel} · 字彙表共 ${words.length} 筆 · 本回合 ${roundWords.length} 字`;
   setAnswerVisible(false);
 }
@@ -104,7 +141,7 @@ document.querySelector("#retry-round").addEventListener("click", () => {
   toggleButton.focus();
 });
 document.querySelector("#new-round").addEventListener("click", () => {
-  startRound();
+  startRound(false, roundMode === "collocations" ? "collocations" : "random");
   toggleButton.focus();
 });
 
@@ -265,10 +302,13 @@ function renderQuestion() {
   document.querySelector("#quiz-uncertain").checked = false;
   document.querySelector("#quiz-uncertain").disabled = false;
   const entry = quizWords[quizIndex];
+  const cloze = roundMode === "collocations" ? collocationFor(entry) : null;
   progress.textContent = `POP QUIZ ${quizIndex + 1} / ${quizWords.length}`;
   progressBar.max = quizWords.length;
   progressBar.value = quizIndex + 1;
-  document.querySelector("#quiz-title").textContent = meaning(entry);
+  document.querySelector("#quiz-title").textContent = cloze ? cloze[0] : meaning(entry);
+  document.querySelector("#quiz-title").classList.toggle("cloze", Boolean(cloze));
+  document.querySelector("#quiz-title").lang = cloze ? "en" : "zh-Hant";
   document.querySelector("#quiz-feedback").textContent = "";
   quizNext.hidden = true;
   quizNext.textContent = quizIndex === quizWords.length - 1 ? "查看成績" : "下一題";
@@ -276,7 +316,7 @@ function renderQuestion() {
   options.replaceChildren();
   const senses = value => meaning(value).split(/[；;、，,]/).map(s => s.trim()).filter(Boolean);
   const used = new Set([entry.english.toLowerCase()]);
-  const alternatives = shuffle(words).filter(candidate => {
+  const alternatives = cloze ? cloze[1].map(english => ({ english })) : shuffle(words).filter(candidate => {
     const key = candidate.english.toLowerCase();
     if (used.has(key) || senses(candidate).some(s => senses(entry).includes(s))) return false;
     used.add(key);
@@ -286,6 +326,10 @@ function renderQuestion() {
   document.querySelector("#quiz-form").hidden = alternatives.length > 0;
   document.querySelector("#quiz-mode").textContent = alternatives.length ? "POP QUIZ · 看中文，選英文" : "POP QUIZ · 看中文，寫英文";
   document.querySelector("#quiz-instruction").textContent = alternatives.length ? "選出本回合學過、符合這個意思的單字。" : "可用選項不足，請寫出本回合學過的英文單字。";
+  if (cloze) {
+    document.querySelector("#quiz-mode").textContent = "POP QUIZ · TOEIC 搭配詞填空";
+    document.querySelector("#quiz-instruction").textContent = "選出最適合空格的字，完成這個商務情境句子。";
+  }
   document.querySelector("#quiz-input").value = "";
   document.querySelector("#quiz-input").disabled = false;
   document.querySelector('#quiz-form button').disabled = false;
@@ -324,6 +368,10 @@ function submitAnswer(answer) {
   document.querySelector("#quiz-feedback").textContent = `${correct ? "答對了！" : "答錯了，已加入累積錯題。"} 正解：${entry.english} — ${meaning(entry)}${entry.example ? `。例句：${entry.example}` : ""}`;
   const scheduled = learning.find(item => identity(item) === identity(entry));
   document.querySelector("#quiz-feedback").textContent += `${correct && uncertain ? " 本題已標記不確定。" : ""} 下次複習：${scheduled.due}。`;
+  if (roundMode === "collocations") {
+    const cloze = collocationFor(entry);
+    document.querySelector("#quiz-feedback").textContent += ` 完整句：${cloze[0].replace("___", entry.english)} 搭配解析：${cloze[2]}`;
+  }
   quizNext.hidden = false;
   quizNext.focus();
 }
@@ -409,6 +457,8 @@ function renderLearning() {
   const due = records.filter(r => r.due <= dayKey()).length;
   const uncertain = records.filter(r => r.outcome === "uncertain").length;
   const wrong = mistakes.filter(r => current.has(identity(r))).length;
+  const supported = new Set(words.filter(collocationFor).map(r => r.english.trim().toLowerCase())).size;
+  document.querySelector("#collocation-coverage").textContent = `搭配詞填空：目前字彙表有 ${supported} 個字可練，每回合最多 10 字，先看字卡再做填空。使用自編商務例句，非官方 TOEIC 試題；未收錄的字仍可練中英配對。`;
   document.querySelector("#review-summary").textContent = `目前字彙表：今日待複習 ${due} 字 · 曾答錯 ${wrong} 字 · 不確定 ${uncertain} 字 · 尚未測驗 ${Math.max(0, current.size - records.length)} 字`;
   const list = document.querySelector("#learning-list");
   list.replaceChildren();
@@ -418,7 +468,7 @@ function renderLearning() {
     list.append(li);
   });
 }
-for (const [id, mode] of [["due-round", "due"], ["mistake-round", "mistakes"], ["uncertain-round", "uncertain"], ["random-round", "random"]]) {
+for (const [id, mode] of [["due-round", "due"], ["mistake-round", "mistakes"], ["uncertain-round", "uncertain"], ["random-round", "random"], ["collocation-round", "collocations"]]) {
   document.querySelector(`#${id}`).addEventListener("click", () => {
     importVersion++;
     startRound(false, mode);
