@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="每回合十個單字，搭配 POP QUIZ 與累積錯題紀錄。">
   <title>每日單字 · English Flashcards</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="app.js?v=20261016-csv" defer></script>
+  <link rel="stylesheet" href="style.css?v=20261019-review">
+  <script src="app.js?v=20261019-review" defer></script>
 </head>
 <body>
   <main class="study">
@@ -15,6 +15,18 @@
       <h1>每日單字</h1>
       <p class="intro">先想想意思，再翻開答案。每天進步一點點。</p>
     </header>
+    <section class="review-panel" aria-labelledby="review-title">
+      <h2 id="review-title">今天練什麼？</h2>
+      <p id="review-summary" aria-live="polite"></p>
+      <div class="review-actions">
+        <button id="due-round" type="button">今日待複習</button>
+        <button id="mistake-round" type="button">錯題專屬</button>
+        <button id="uncertain-round" type="button">不確定字彙</button>
+        <button id="random-round" type="button">隨機 10 字</button>
+      </div>
+      <p id="review-message" role="status"></p>
+      <p class="footnote">切換模式會重新開始回合，已作答紀錄會保留。答對且確定依序隔 1、3、7、14、30 天複習；答錯或不確定隔天再練。同一天重練不會加速升級。</p>
+    </section>
     <section aria-label="英文單字練習">
       <div class="progress-row"><span>日常單字練習</span><span id="progress" aria-live="polite"></span></div>
       <progress id="progress-bar" max="6" value="1" aria-label="單字卡進度"></progress>
@@ -37,6 +49,7 @@
         <p id="quiz-mode" class="eyebrow">POP QUIZ · 看中文，選英文</p>
         <h2 id="quiz-title" tabindex="-1"></h2>
         <p id="quiz-instruction">選出本回合學過、符合這個意思的單字。</p>
+        <label class="uncertain-label"><input id="quiz-uncertain" type="checkbox"> 這題不確定／我是猜的（先勾選，再作答）</label>
         <div id="quiz-options" class="quiz-options"></div>
         <form id="quiz-form" hidden>
           <label for="quiz-input">請輸入英文（不分大小寫）</label>
@@ -62,6 +75,11 @@
       <p id="storage-status">儲存在此瀏覽器；不同裝置或網址不會同步，清除網站資料後會消失。</p>
       <p id="mistakes-summary" aria-live="polite"></p>
       <details><summary>查看錯題與答錯次數</summary><ul id="mistakes-list" class="mistakes-list"></ul></details>
+      <details><summary>查看熟悉度與下次複習</summary><ul id="learning-list" class="mistakes-list"></ul></details>
+      <div class="import-actions"><button id="export-learning" type="button">匯出學習紀錄</button></div>
+      <label for="import-learning">匯入學習紀錄備份（JSON，上限 5 MB）</label>
+      <input id="import-learning" type="file" accept=".json,application/json">
+      <p id="backup-status" role="status">匯入會合併紀錄：同一字保留較新排程，累計次數取較大值，避免重複匯入加倍。備份不含整份字彙表。</p>
     </section>
     <section class="import-panel" aria-labelledby="import-title">
       <h2 id="import-title">我的字彙表</h2>
