@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="每回合十個單字，搭配 POP QUIZ 與累積錯題紀錄。">
   <title>每日單字 · English Flashcards</title>
-  <link rel="stylesheet" href="style.css?v=20261019-cloze">
-  <script src="app.js?v=20261019-cloze" defer></script>
+  <link rel="stylesheet" href="style.css?v=20261020-spelling">
+  <script src="app.js?v=20261020-spelling" defer></script>
 </head>
 <body>
   <main class="study">
@@ -24,6 +24,7 @@
         <button id="uncertain-round" type="button">不確定字彙</button>
         <button id="random-round" type="button">隨機 10 字</button>
         <button id="collocation-round" type="button">TOEIC 搭配詞填空</button>
+        <button id="spelling-round" type="button">拼字測驗</button>
       </div>
       <p id="collocation-coverage" class="footnote"></p>
       <p id="review-message" role="status"></p>
@@ -57,6 +58,8 @@
           <label for="quiz-input">請輸入英文（不分大小寫）</label>
           <input id="quiz-input" autocomplete="off" autocapitalize="none" spellcheck="false">
           <button type="submit">確認答案</button>
+          <button id="spelling-hint" type="button">提示首字母</button>
+          <p id="spelling-hint-text" role="status"></p>
         </form>
         <p id="quiz-feedback" role="status"></p>
         <button id="quiz-next" class="primary" type="button" hidden>下一題</button>

@@ -13,7 +13,8 @@
 .uncertain-label { display: flex; align-items: center; gap: 10px; text-align: left; font-size: 14px; padding: 14px 0; line-height: 1.6; }
 .uncertain-label input { width: 20px; height: 20px; flex: 0 0 auto; }
 #quiz-title.cloze { font-size: clamp(23px, 5vw, 30px); text-align: left; line-height: 1.6; letter-spacing: 0; }
-#collocation-round { grid-column: 1 / -1; }
+#spelling-hint { margin: 8px 0; }
+#spelling-hint-text { font-size: 14px; line-height: 1.7; }
 * { box-sizing: border-box; }
 body { margin: 0; min-height: 100vh; padding: 64px 24px 36px; }
 .study { max-width: 600px; margin: 0 auto; }

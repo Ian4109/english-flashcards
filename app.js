@@ -69,7 +69,7 @@ function startRound(reuse = false, mode = "random") {
       seen.add(key);
       return true;
     });
-    if (mode !== "random") {
+    if (mode !== "random" && mode !== "spelling") {
       pool = pool.filter(entry => {
         const record = learning.find(item => identity(item) === identity(entry));
         if (mode === "collocations") return Boolean(collocationFor(entry));
@@ -120,7 +120,7 @@ function renderCard() {
   progressBar.max = roundWords.length;
   progressBar.value = currentIndex + 1;
   nextButton.textContent = currentIndex === roundWords.length - 1 ? "開始 POP QUIZ" : "下一張 →";
-  const modeLabel = { random: "隨機練習", due: "今日待複習", mistakes: "錯題專屬", uncertain: "不確定字彙", collocations: "TOEIC 搭配詞填空" }[roundMode];
+  const modeLabel = { random: "隨機練習", due: "今日待複習", mistakes: "錯題專屬", uncertain: "不確定字彙", collocations: "TOEIC 搭配詞填空", spelling: "拼字測驗" }[roundMode];
   document.querySelector("#deck-summary").textContent = `${modeLabel} · 字彙表共 ${words.length} 筆 · 本回合 ${roundWords.length} 字`;
   setAnswerVisible(false);
 }
@@ -141,7 +141,7 @@ document.querySelector("#retry-round").addEventListener("click", () => {
   toggleButton.focus();
 });
 document.querySelector("#new-round").addEventListener("click", () => {
-  startRound(false, roundMode === "collocations" ? "collocations" : "random");
+  startRound(false, ["collocations", "spelling"].includes(roundMode) ? roundMode : "random");
   toggleButton.focus();
 });
 
@@ -286,6 +286,7 @@ function recordMistake(entry, answer) {
   renderMistakes();
 }
 let quizWords = [], quizIndex = 0, quizScore = 0, answered = false, uncertainCorrect = 0;
+let hintUsed = false;
 const quizNext = document.querySelector("#quiz-next");
 function startQuiz() {
   quizWords = shuffle(roundWords);
@@ -299,6 +300,9 @@ function startQuiz() {
 }
 function renderQuestion() {
   answered = false;
+  hintUsed = false;
+  document.querySelector("#spelling-hint").disabled = false;
+  document.querySelector("#spelling-hint-text").textContent = "";
   document.querySelector("#quiz-uncertain").checked = false;
   document.querySelector("#quiz-uncertain").disabled = false;
   const entry = quizWords[quizIndex];
@@ -316,7 +320,7 @@ function renderQuestion() {
   options.replaceChildren();
   const senses = value => meaning(value).split(/[；;、，,]/).map(s => s.trim()).filter(Boolean);
   const used = new Set([entry.english.toLowerCase()]);
-  const alternatives = cloze ? cloze[1].map(english => ({ english })) : shuffle(words).filter(candidate => {
+  const alternatives = roundMode === "spelling" ? [] : cloze ? cloze[1].map(english => ({ english })) : shuffle(words).filter(candidate => {
     const key = candidate.english.toLowerCase();
     if (used.has(key) || senses(candidate).some(s => senses(entry).includes(s))) return false;
     used.add(key);
@@ -326,13 +330,17 @@ function renderQuestion() {
   document.querySelector("#quiz-form").hidden = alternatives.length > 0;
   document.querySelector("#quiz-mode").textContent = alternatives.length ? "POP QUIZ · 看中文，選英文" : "POP QUIZ · 看中文，寫英文";
   document.querySelector("#quiz-instruction").textContent = alternatives.length ? "選出本回合學過、符合這個意思的單字。" : "可用選項不足，請寫出本回合學過的英文單字。";
+  if (roundMode === "spelling") {
+    document.querySelector("#quiz-mode").textContent = "POP QUIZ · 拼字測驗";
+    document.querySelector("#quiz-instruction").textContent = "請輸入本回合學過的英文單字或片語。需要時可提示首字母；使用提示答對會列為不確定，隔天再複習。";
+  }
   if (cloze) {
     document.querySelector("#quiz-mode").textContent = "POP QUIZ · TOEIC 搭配詞填空";
     document.querySelector("#quiz-instruction").textContent = "選出最適合空格的字，完成這個商務情境句子。";
   }
   document.querySelector("#quiz-input").value = "";
   document.querySelector("#quiz-input").disabled = false;
-  document.querySelector('#quiz-form button').disabled = false;
+  document.querySelector('#quiz-form button[type="submit"]').disabled = false;
   if (alternatives.length) shuffle([entry, ...alternatives]).forEach(option => {
     const button = document.createElement("button");
     button.type = "button";
@@ -354,7 +362,7 @@ function submitAnswer(answer) {
   const correct = normalized(answer) === normalized(entry.english);
   if (correct) quizScore++;
   else recordMistake(entry, answer);
-  const uncertain = document.querySelector("#quiz-uncertain").checked;
+  const uncertain = hintUsed || document.querySelector("#quiz-uncertain").checked;
   if (correct && uncertain) uncertainCorrect++;
   document.querySelector("#quiz-uncertain").disabled = true;
   updateLearning(entry, correct ? (uncertain ? "uncertain" : "correct") : "wrong");
@@ -364,7 +372,8 @@ function submitAnswer(answer) {
     else if (button.textContent === answer) button.classList.add("incorrect");
   });
   document.querySelector("#quiz-input").disabled = true;
-  document.querySelector('#quiz-form button').disabled = true;
+  document.querySelector('#quiz-form button[type="submit"]').disabled = true;
+  document.querySelector("#spelling-hint").disabled = true;
   document.querySelector("#quiz-feedback").textContent = `${correct ? "答對了！" : "答錯了，已加入累積錯題。"} 正解：${entry.english} — ${meaning(entry)}${entry.example ? `。例句：${entry.example}` : ""}`;
   const scheduled = learning.find(item => identity(item) === identity(entry));
   document.querySelector("#quiz-feedback").textContent += `${correct && uncertain ? " 本題已標記不確定。" : ""} 下次複習：${scheduled.due}。`;
@@ -375,6 +384,13 @@ function submitAnswer(answer) {
   quizNext.hidden = false;
   quizNext.focus();
 }
+document.querySelector("#spelling-hint").addEventListener("click", () => {
+  if (answered || document.querySelector("#quiz-form").hidden) return;
+  hintUsed = true;
+  document.querySelector("#spelling-hint-text").textContent = `首字母：${quizWords[quizIndex].english.trim()[0]}…（使用提示後，答對仍安排隔天複習）`;
+  document.querySelector("#spelling-hint").disabled = true;
+  document.querySelector("#quiz-input").focus();
+});
 document.querySelector("#quiz-form").addEventListener("submit", event => {
   event.preventDefault();
   submitAnswer(document.querySelector("#quiz-input").value);
@@ -468,7 +484,7 @@ function renderLearning() {
     list.append(li);
   });
 }
-for (const [id, mode] of [["due-round", "due"], ["mistake-round", "mistakes"], ["uncertain-round", "uncertain"], ["random-round", "random"], ["collocation-round", "collocations"]]) {
+for (const [id, mode] of [["due-round", "due"], ["mistake-round", "mistakes"], ["uncertain-round", "uncertain"], ["random-round", "random"], ["collocation-round", "collocations"], ["spelling-round", "spelling"]]) {
   document.querySelector(`#${id}`).addEventListener("click", () => {
     importVersion++;
     startRound(false, mode);
